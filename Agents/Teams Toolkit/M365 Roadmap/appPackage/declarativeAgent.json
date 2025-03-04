@@ -1,0 +1,35 @@
+{
+    "$schema": "https://developer.microsoft.com/json-schemas/copilot/declarative-agent/v1.2/schema.json",
+    "version": "v1.2",
+    "name": "RoadMap Bot",
+    "description": "Declarative agent created with Teams Toolkit",
+    "instructions": "$[file('instruction.txt')]",
+    "actions": [
+        {
+            "id": "action_1",
+            "file": "ai-plugin.json"
+        }
+    ],
+    "conversation_starters": [
+        {
+            "title": "➡️ Microsoft Copilot Roadmap items this month",
+            "text": "List the M365 Copilot roadmap items that will be release this month"
+        },
+        {
+            "title": "➡️ List the M365 Copilot roadmap items GA this moth",
+            "text": "List the M365 Copilot roadmap items that will be GA this month"
+        }
+    ],
+    "capabilities": [
+        {
+            "name": "WebSearch"
+
+        },
+        {
+            "name":"CodeInterpreter"
+        },
+        {
+            "name":"GraphicArt"
+        }
+    ]
+}

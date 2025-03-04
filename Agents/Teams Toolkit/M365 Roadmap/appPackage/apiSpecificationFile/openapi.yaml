@@ -1,0 +1,95 @@
+openapi: 3.0.0
+info:
+  title: Microsoft 365 Release Communications API
+  description: >-
+    Provides information on upcoming releases and updates for Microsoft 365
+    products.
+  version: 1.0.0
+servers:
+  - url: https://www.microsoft.com/releasecommunications/api/v1
+paths:
+  /m365:
+    get:
+      summary: Retrieve Microsoft 365 release communications
+      description: >-
+        Fetches a list of upcoming releases and updates for Microsoft 365
+        products.
+      responses:
+        '200':
+          description: A JSON array of release communications.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReleaseCommunication'
+      operationId: getM365
+components:
+  schemas:
+    ReleaseCommunication:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the release communication.
+        title:
+          type: string
+          description: Title of the release communication.
+        description:
+          type: string
+          description: Detailed description of the release.
+        moreInfoLink:
+          type: string
+          format: uri
+          nullable: true
+          description: URL for more information about the release.
+        publicDisclosureAvailabilityDate:
+          type: string
+          description: Expected public disclosure date of the release.
+        publicPreviewDate:
+          type: string
+          nullable: true
+          description: Date when the release is available for public preview.
+        created:
+          type: string
+          format: date-time
+          description: Timestamp when the release communication was created.
+        publicRoadmapStatus:
+          type: string
+          description: Status of the release on the public roadmap.
+        status:
+          type: string
+          description: Current development status of the release.
+        modified:
+          type: string
+          format: date-time
+          description: Timestamp when the release communication was last modified.
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tag'
+        tagsContainer:
+          type: object
+          properties:
+            products:
+              type: array
+              items:
+                $ref: '#/components/schemas/Tag'
+            cloudInstances:
+              type: array
+              items:
+                $ref: '#/components/schemas/Tag'
+            releasePhase:
+              type: array
+              items:
+                $ref: '#/components/schemas/Tag'
+            platforms:
+              type: array
+              items:
+                $ref: '#/components/schemas/Tag'
+    Tag:
+      type: object
+      properties:
+        tagName:
+          type: string
+          description: Name of the tag.
