@@ -1,4 +1,4 @@
-# This and example of how to create an Agent using Teams Toolkit and API. In this case I'm using the M365 Roadmap API endpoint.
+# This is an example of how to create an agent using the Teams Toolkit and API. In this case, I'm using the M365 Roadmap API endpoint.
 
 
 # Overview of the basic declarative agent with API plugin template
