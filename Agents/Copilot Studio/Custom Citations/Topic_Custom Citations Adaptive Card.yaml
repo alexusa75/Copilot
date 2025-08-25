@@ -1,0 +1,241 @@
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnGeneratedResponse
+  id: main
+  condition: =CountRows(System.Response.Citations)>0
+  actions:
+    - kind: SetVariable
+      id: setVariable_wtNwaw
+      variable: Topic.externalWebsiteURL
+      value: https://yourwebsite.com/citations/
+
+    - kind: SetVariable
+      id: setVariable_9IFwdP
+      variable: Topic.CitationsSnip
+      value: |-
+        =With(
+            { CT: System.Response.Citations },
+            Concat(
+                // Iterate 1..N over the citations
+                Sequence(CountRows(CT)),
+                // For each index, fetch the record and build one line: "n. [Title](URL)"
+                With(
+                    {
+                        idx: Value,
+                        rec: Index(CT, Value)
+                    },
+                    With(
+                        {
+                            // If Url exists -> use it
+                            // Else if Name is http(s) -> use it (encode spaces)
+                            // Else -> base + Name (encode spaces)
+                            baseUrl:
+                                If(
+                                    Not(IsBlank(rec.Url)),
+                                    rec.Url,
+                                    If(
+                                        Or(Left(rec.Name, 8) = "https://", Left(rec.Name, 7) = "http://"),
+                                        Substitute(rec.Name, " ", "%20"),
+                                        Substitute(Topic.externalWebsiteURL & rec.Name, " ", "%20")
+                                    )
+                                ),
+
+                            // Add "#page=N" ONLY when Url is blank AND Name ends with ".pdf" AND a page tag exists
+                            pageFrag:
+                                If(
+                                    And(
+                                        IsBlank(rec.Url),
+                                        EndsWith(rec.Name, ".pdf"),
+                                        Find("<page value=", rec.Text) > 0
+                                    ),
+                                    With(
+                                        {
+                                            q1: Find(Char(34), rec.Text, Find("<page value=", rec.Text)),
+                                            q2: Find(Char(34), rec.Text, Find(Char(34), rec.Text, Find("<page value=", rec.Text)) + 1)
+                                        },
+                                        "#page=" & Mid(rec.Text, q1 + 1, q2 - q1 - 1)
+                                    ),
+                                    ""
+                                ),
+
+                            // Human-friendly title from Name (last path segment, strip ?query, decode %20 -> space)
+                            title:
+                                Substitute(
+                                    If(
+                                        Find("?", Last(Split(rec.Name, "/")).Value) > 0,
+                                        Left(
+                                            Last(Split(rec.Name, "/")).Value,
+                                            Find("?", Last(Split(rec.Name, "/")).Value) - 1
+                                        ),
+                                        Last(Split(rec.Name, "/")).Value
+                                    ),
+                                    "%20",
+                                    " "
+                                )
+                        },
+                        idx & ". [" & title & "](" & baseUrl & pageFrag & ")"
+                    )
+                ),
+                Char(10)    // use Char(10) & Char(10) if you want a blank line between items
+            )
+        )
+
+    - kind: SetVariable
+      id: setVariable_iiKiW8
+      variable: Topic._CustomRespond
+      value: |-
+        =With(
+          {
+            body: System.Response.FormattedText,
+            cut: Find("[1]:", System.Response.FormattedText)
+          },
+          If(
+            cut > 0,
+            Left(body, cut - 1),
+            body
+          )
+          & Char(10) & Char(10)                // blank line
+        )
+
+    - kind: SendActivity
+      id: sendActivity_TU8wlz
+      activity: "{Topic._CustomRespond}"
+
+    - kind: SetVariable
+      id: setVariable_0Hw9Gw
+      variable: Topic._AdaptiveCardColor
+      value: '""'
+
+    - kind: SendActivity
+      id: sendActivity_qwYOa9
+      activity:
+        attachments:
+          - kind: AdaptiveCardTemplate
+            cardContent: |-
+              =With(
+                {
+                  CT: System.Response.Citations,
+                  // Map your _AdaptiveCardColor to an Adaptive Card container style
+                  bg: Switch(
+                        Lower(Trim(Coalesce(Topic._AdaptiveCardColor, ""))),
+                        "green", "good",
+                        "yellow", "warning",
+                        "red", "attention",
+                        "blue", "accent",
+                        // also accept native style names directly
+                        "good", "good",
+                        "warning", "warning",
+                        "attention", "attention",
+                        "accent", "accent",
+                        "default", "default",
+                        "emphasis" // fallback
+                      )
+                },
+                {
+                  type: "AdaptiveCard",
+                  version: "1.5",
+                  body: [
+                    {
+                      type: "Container",
+                      style: bg,
+                      bleed: true,
+                      items: [
+                        {
+                          type: "TextBlock",
+                          text: "Citations:",
+                          weight: "bolder",
+                          size: "Medium",
+                          wrap: true
+                        },
+                        {
+                          type: "Container",
+                          spacing: "Small",
+                          items:
+                            ForAll(
+                              Sequence(CountRows(CT)),
+                              With(
+                                { idx: Value, rec: Index(CT, Value) },
+                                With(
+                                  {
+                                    baseUrl:
+                                      If(
+                                        Not(IsBlank(rec.Url)),
+                                        rec.Url,
+                                        If(
+                                          Or(Left(rec.Name, 8) = "https://", Left(rec.Name, 7) = "http://"),
+                                          Substitute(rec.Name, " ", "%20"),
+                                          Substitute(Topic.externalWebsiteURL & rec.Name, " ", "%20")
+                                        )
+                                      ),
+                                    pageFrag:
+                                      If(
+                                        And(IsBlank(rec.Url), EndsWith(rec.Name, ".pdf"), Find("<page value=", rec.Text) > 0),
+                                        With(
+                                          {
+                                            q1: Find(Char(34), rec.Text, Find("<page value=", rec.Text)),
+                                            q2: Find(Char(34), rec.Text, Find(Char(34), rec.Text, Find("<page value=", rec.Text)) + 1)
+                                          },
+                                          "#page=" & Mid(rec.Text, q1 + 1, q2 - q1 - 1)
+                                        ),
+                                        ""
+                                      ),
+                                    title:
+                                      Substitute(
+                                        If(
+                                          Find("?", Last(Split(rec.Name, "/")).Value) > 0,
+                                          Left(Last(Split(rec.Name, "/")).Value, Find("?", Last(Split(rec.Name, "/")).Value) - 1),
+                                          Last(Split(rec.Name, "/")).Value
+                                        ),
+                                        "%20", " "
+                                      )
+                                  },
+                                  {
+                                    type: "ColumnSet",
+                                    spacing: "None",
+                                    columns: [
+                                      {
+                                        type: "Column",
+                                        width: "auto",
+                                        items: [
+                                          {
+                                            type: "TextBlock",
+                                            text: Text(idx),
+                                            weight: "bolder",
+                                            size: "Small",
+                                            isSubtle: true
+                                          }
+                                        ]
+                                      },
+                                      {
+                                        type: "Column",
+                                        width: "stretch",
+                                        items: [
+                                          {
+                                            type: "TextBlock",
+                                            // Markdown hyperlink: [Title](URL)
+                                            text: "[" & title & "](" & baseUrl & pageFrag & ")",
+                                            size: "Small",
+                                            isSubtle: true,
+                                            wrap: true
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                )
+                              )
+                            )
+                        }
+                      ]
+                    }
+                  ]
+                }
+              )
+
+    - kind: SetVariable
+      id: setVariable_jVzQGX
+      variable: System.ContinueResponse
+      value: false
+
+inputType: {}
+outputType: {}
