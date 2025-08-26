@@ -26,28 +26,6 @@ When your bot cites **uploaded knowledge files** (files you add under *Knowledge
 
 ---
 
-## 🎨 Optional color: `Topic._AdaptiveCardColor`
-
-The Adaptive Card variant supports a container background via `Topic._AdaptiveCardColor`.
-
-**Friendly names → styles**
-- 🟢 `green` → `good`
-- 🟡 `yellow` → `warning`
-- 🔴 `red` → `attention`
-- 🔵 `blue` → `accent`
-
-**Native styles**
-- ✅ `good`
-- ⚠️ `warning`
-- 🚨 `attention`
-- 🎯 `accent`
-- 🧱 `default`
-- ✨ `emphasis`
-
-Anything else (or blank) falls back to **`emphasis`** ✨.
-
----
-
 ## 🧠 What the Topics do
 
 1. 🛎️ **Trigger** on `OnGeneratedResponse` and run only when `System.Response.Citations` has rows.
