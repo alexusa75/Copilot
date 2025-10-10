@@ -1,0 +1,215 @@
+kind: AdaptiveDialog
+modelDescription: Provide Feedback
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent: {}
+  actions:
+    - kind: AdaptiveCardPrompt
+      id: GmrXYz
+      card: |-
+        {
+          "$schema": "https://adaptivecards.io/schemas/adaptive-card.json",
+          "type": "AdaptiveCard",
+          "version": "1.5",
+          "body": [
+            {
+              "type": "TextBlock",
+              "text": "We'd love your feedback!",
+              "weight": "Bolder",
+              "size": "Large",
+              "wrap": true
+            },
+            {
+              "type": "TextBlock",
+              "text": "How would you rate your experience?",
+              "wrap": true,
+              "spacing": "Medium"
+            },
+            {
+              "type": "Input.ChoiceSet",
+              "id": "rating",
+              "style": "expanded",
+              "choices": [
+                {
+                  "title": "⭐ 1 Star",
+                  "value": "1"
+                },
+                {
+                  "title": "⭐⭐ 2 Stars",
+                  "value": "2"
+                },
+                {
+                  "title": "⭐⭐⭐ 3 Stars",
+                  "value": "3"
+                },
+                {
+                  "title": "⭐⭐⭐⭐ 4 Stars",
+                  "value": "4"
+                },
+                {
+                  "title": "⭐⭐⭐⭐⭐ 5 Stars",
+                  "value": "5"
+                }
+              ],
+              "placeholder": "Select your rating"
+            },
+            {
+              "type": "TextBlock",
+              "text": "Tell us more about your experience:",
+              "wrap": true,
+              "spacing": "Medium"
+            },
+            {
+              "type": "Input.Text",
+              "id": "comments",
+              "placeholder": "Enter your comments here...",
+              "isMultiline": true,
+              "maxLength": 500
+            }
+          ],
+          "actions": [
+            {
+              "type": "Action.Submit",
+              "title": "Submit",
+              "style": "positive",
+              "data": {
+                "action": "submit"
+              }
+            },
+            {
+              "type": "Action.Submit",
+              "title": "Cancel",
+              "style": "destructive",
+              "data": {
+                "action": "cancel"
+              }
+            }
+          ]
+        }
+      output:
+        binding:
+          action: Topic.action
+          actionSubmitId: Topic.actionSubmitId
+          comments: Topic.comments
+          rating: Topic.rating
+
+      outputType:
+        properties:
+          action: String
+          actionSubmitId: String
+          comments: String
+          rating: String
+
+    - kind: SendActivity
+      id: sendActivity_CPiZIR
+      activity: |-
+        Action : {Topic.action}
+
+        ActionSubmitId: {Topic.actionSubmitId}
+
+        Comments: {Topic.comments}
+
+        Rating: {Topic.rating}
+
+    - kind: AdaptiveCardPrompt
+      id: AMVDFv
+      card: |-
+        {
+          "$schema": "https://adaptivecards.io/schemas/adaptive-card.json",
+          "type": "AdaptiveCard",
+          "version": "1.5",
+          "body": [
+            {
+              "type": "TextBlock",
+              "text": "We'd love your feedback!",
+              "weight": "Bolder",
+              "size": "Large",
+              "wrap": true
+            },
+            {
+              "type": "TextBlock",
+              "text": "How would you rate your experience?",
+              "wrap": true,
+              "spacing": "Medium"
+            },
+            {
+              "type": "Input.ChoiceSet",
+              "id": "rating",
+              "style": "expanded",
+              "choices": [
+                {
+                  "title": "😞 Very Dissatisfied",
+                  "value": "1"
+                },
+                {
+                  "title": "😐 Dissatisfied",
+                  "value": "2"
+                },
+                {
+                  "title": "😐 Neutral",
+                  "value": "3"
+                },
+                {
+                  "title": "😊 Satisfied",
+                  "value": "4"
+                },
+                {
+                  "title": "😊 Very Satisfied",
+                  "value": "5"
+                }
+              ],
+              "placeholder": "Select your rating"
+            },
+            {
+              "type": "TextBlock",
+              "text": "Tell us more about your experience:",
+              "wrap": true,
+              "spacing": "Medium"
+            },
+            {
+              "type": "Input.Text",
+              "id": "comments",
+              "placeholder": "Enter your comments here...",
+              "isMultiline": true,
+              "maxLength": 500
+            }
+          ],
+          "actions": [
+            {
+              "type": "Action.Submit",
+              "title": "Submit",
+              "style": "positive",
+              "data": {
+                "action": "submit"
+              }
+            },
+            {
+              "type": "Action.Submit",
+              "title": "Cancel",
+              "style": "destructive",
+              "data": {
+                "action": "cancel"
+              }
+            }
+          ]
+        }
+      output:
+        binding:
+          action: Topic.action
+          actionSubmitId: Topic.actionSubmitId
+          comments: Topic.comments
+          rating: Topic.rating
+
+      outputType:
+        properties:
+          action: String
+          actionSubmitId: String
+          comments: String
+          rating: String
+
+    - kind: CancelAllDialogs
+      id: bmZlYg
+
+inputType: {}
+outputType: {}
