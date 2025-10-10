@@ -1,9 +1,8 @@
 kind: AdaptiveDialog
 modelDescription: Provide Feedback
 beginDialog:
-  kind: OnRecognizedIntent
+  kind: OnRedirect
   id: main
-  intent: {}
   actions:
     - kind: AdaptiveCardPrompt
       id: GmrXYz
