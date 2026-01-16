@@ -97,9 +97,3 @@ For more information about Maker welcome content, see:
 - The flow is provided **as-is**
 - Always test in a **non-production environment**
 - Review permissions and deletion logic carefully before enabling automation
-
----
-
-## License
-
-Add your license information here (for example, MIT License), or remove this section if not applicable.
