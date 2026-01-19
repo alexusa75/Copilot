@@ -1,0 +1,105 @@
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent: {}
+  actions:
+    - kind: SetVariable
+      id: setVariable_niMrFt
+      variable: Topic.RolesJson
+      value: "[   {     \"entered\": \"Sample Role A\",     \"field\": \"Sample Field A\",     \"options\": [       { \"value\": \"A01 - alpha operations\" },       { \"value\": \"A02 - beta coordination\" },       { \"value\": \"A03 - gamma analysis\" },       { \"value\": \"A04 - delta support\" },       { \"value\": \"A05 - epsilon management\" },       { \"value\": \"A06 - zeta planning\" },       { \"value\": \"A07 - eta services\" },       { \"value\": \"A08 - theta administration\" },       { \"value\": \"A09 - iota engineering\" },       { \"value\": \"A10 - kappa consulting\" },       { \"value\": \"A11 - lambda operations\" },       { \"value\": \"A12 - mu enablement\" },       { \"value\": \"A13 - nu development\" },       { \"value\": \"A14 - xi quality\" },       { \"value\": \"A15 - omicron delivery\" },       { \"value\": \"A16 - pi assurance\" },       { \"value\": \"A17 - rho integration\" },       { \"value\": \"A18 - sigma optimization\" },       { \"value\": \"A19 - tau coordination\" },       { \"value\": \"A20 - omega strategy\" }     ]   } ]"
+
+    - kind: SetVariable
+      id: setVariable_5fyPG0
+      variable: Topic.RolesTable
+      value: |-
+        =Table(
+            ParseJSON(
+                Topic.RolesJson
+                )
+        )
+
+    - kind: SetVariable
+      id: setVariable_vFo4iM
+      variable: Topic.projectRoleValues
+      value: |-
+        =First(
+            Topic.RolesTable
+            ).Value.options
+
+    - kind: SetVariable
+      id: setVariable_5mmWCa
+      variable: Topic.ForAllVar
+      value: |-
+        =ForAll(
+            Topic.projectRoleValues,
+            {
+                title: ThisRecord.value,
+                value: ThisRecord.value
+            }
+        )
+
+    - kind: AdaptiveCardPrompt
+      id: iDsefD
+      card: |-
+        ={
+          '$schema': "https://adaptivecards.io/schemas/adaptive-card.json",
+          type: "AdaptiveCard",
+          version: "1.5",
+          body: [
+            {
+              type: "TextBlock",
+              text: "Testing",
+              size: "Large",
+              weight: "Bolder",
+              style: "heading",
+              wrap: true
+            },
+            {
+              type: "TextBlock",
+              text: "${formatDateTime(start.dateTime, 'HH:mm')} - ${formatDateTime(end.dateTime, 'hh:mm')}",
+              isSubtle: true,
+              spacing: "None",
+              wrap: true
+            },
+            {
+              type: "Input.ChoiceSet",
+              id: "options",
+              label: "Options",
+              choices: Topic.ForAllVar
+            }
+          ],
+          actions: [
+            {
+              type: "Action.Submit",
+              title: "Accept",
+              data: {
+                x: "accept"
+              }
+            },
+            {
+              type: "Action.Submit",
+              title: "Cancel",
+              data: {
+                x: "cancel"
+              }
+            }
+          ]
+        }
+      output:
+        binding:
+          actionSubmitId: Topic.actionSubmitId
+          options: Topic.options
+          x: Topic.x
+
+      outputType:
+        properties:
+          actionSubmitId: String
+          options: String
+          x: String
+
+    - kind: EndConversation
+      id: bAFtVb
+
+inputType: {}
+outputType: {}
