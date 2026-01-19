@@ -56,13 +56,6 @@ beginDialog:
               wrap: true
             },
             {
-              type: "TextBlock",
-              text: "${formatDateTime(start.dateTime, 'HH:mm')} - ${formatDateTime(end.dateTime, 'hh:mm')}",
-              isSubtle: true,
-              spacing: "None",
-              wrap: true
-            },
-            {
               type: "Input.ChoiceSet",
               id: "options",
               label: "Options",
