@@ -1,4 +1,4 @@
-# 🤖 Copilot Studio – Verbatim Knowledge Source Response Pattern
+# Copilot Studio – Verbatim Knowledge Source Response Pattern
 
 ## ✨ Overview
 
@@ -6,9 +6,9 @@ This repository contains an exported **Copilot Studio Agent solution** that demo
 
 The primary use case showcased is **Plan and Benefit Packages**, but the **core intent of this demo is architectural**, not prescriptive. It is meant to show that:
 
-* Verbatim quotes **can be retrieved** from knowledge sources
-* Those quotes **can be controlled and constrained** using AI prompts
-* The verbatim content **can be selectively exposed** to users as part of the experience
+- Verbatim quotes **can be retrieved** from knowledge sources
+- Those quotes **can be controlled and constrained** using AI prompts
+- The verbatim content **can be selectively exposed** to users as part of the experience
 
 Makers are encouraged to **adapt the topic logic, triggers, and presentation** based on their own use cases, UX requirements, and governance needs.
 
@@ -20,10 +20,10 @@ By default, Copilot Studio **summarize or paraphrase** information retrieved fro
 
 This solution addresses the need to:
 
-* Preserve **exact policy language**
-* Avoid AI summarization or interpretation
-* Provide transparency into the **exact source content** used
-* Support audit, compliance, and trust requirements
+- Preserve **exact policy language**
+- Avoid AI summarization or interpretation
+- Provide transparency into the **exact source content** used
+- Support audit, compliance, and trust requirements
 
 ---
 
@@ -31,9 +31,9 @@ This solution addresses the need to:
 
 The agent is implemented using:
 
-* A knowledge source containing **Plan and Benefit Packages** information
-* Two topics orchestrated together
-* A custom AI prompt with strict verbatim rules
+- A knowledge source containing **Plan and Benefit Packages** information
+- Two topics orchestrated together
+- A custom AI prompt with strict verbatim rules
 
 ### High-Level Flow
 
@@ -44,9 +44,8 @@ The agent is implemented using:
 5. `Verbatim` retrieves raw, non-summarized knowledge source content
 6. AI prompt filters and returns **verbatim quotes only**
 7. `OnGenerated` returns:
-
-   * The generated response
-   * The verbatim knowledge source quote
+   - The generated response
+   - The verbatim knowledge source quote
 
 ---
 
@@ -58,26 +57,26 @@ The agent is implemented using:
 
 ![AI Prompt Verbatim Instructions](./images/AiPrompt.png)
 
-*Description:* Shows the **AI Prompt instructions** that enforce verbatim quoting, prohibit summarization or inference, and restrict responses to the provided search results.
+_Description:_ Shows the **AI Prompt instructions** that enforce verbatim quoting, prohibit summarization or inference, and restrict responses to the provided search results.
 
 ### Screenshot 2 – Initial Agent Response (No Source Shown) 💬
 
 ![Initial Agent Response](./images/FirstResponse.png)
 
-*Description:* Shows the **initial agent response** generated for a plan or benefit package question, presented without exposing the underlying knowledge source content.
+_Description:_ Shows the **initial agent response** generated for a plan or benefit package question, presented without exposing the underlying knowledge source content.
 
 ### Screenshot 3 – Expanded Details Showing Verbatim Knowledge Source 📖
 
 ![Expanded Verbatim Knowledge Source](./images/ExpandedResponse.png)
 
-*Description:* Shows the response after the user selects **"Show details"**, where the adaptive card expands to reveal the **exact verbatim quote** from the knowledge source used to generate the answer.
+_Description:_ Shows the response after the user selects **"Show details"**, where the adaptive card expands to reveal the **exact verbatim quote** from the knowledge source used to generate the answer.
 
 ---
 
 ## Knowledge Source
 
-* Plan and Benefit Packages documentation is configured as a Copilot Studio knowledge source
-* The solution works with any supported knowledge source and can be easily replaced
+- Plan and Benefit Packages documentation is configured as a Copilot Studio knowledge source
+- The solution works with any supported knowledge source and can be easily replaced
 
 ---
 
@@ -87,15 +86,13 @@ The **Verbatim** topic is responsible for retrieving **non-summarized content** 
 
 ### Key Components
 
-* **Custom Search Node**
+- **Custom Search Node**
+  - Queries the knowledge source
+  - Returns raw (non-summarized) results
 
-  * Queries the knowledge source
-  * Returns raw (non-summarized) results
-
-* **Search Results Variable**
-
-  * Stores the retrieved content exactly as returned
-  * Passed downstream without modification
+- **Search Results Variable**
+  - Stores the retrieved content exactly as returned
+  - Passed downstream without modification
 
 ### Purpose
 
@@ -132,9 +129,9 @@ FORMAT:
 
 ### Result
 
-* Output contains **only exact quotes** from the knowledge source
-* No AI interpretation or hallucination
-* Fully auditable and deterministic behavior
+- Output contains **only exact quotes** from the knowledge source
+- No AI interpretation or hallucination
+- Fully auditable and deterministic behavior
 
 ---
 
@@ -145,19 +142,17 @@ The **OnGenerated** topic is responsible for presenting the final user experienc
 ### Output Includes
 
 1. **Generated Formatted Response**
-
-   * Clean, user-friendly presentation
+   - Clean, user-friendly presentation
 
 2. **Adaptive Card**
-
-   * Includes a button (e.g., "View Source" or "Show Exact Quote")
-   * Expanding the card reveals the **verbatim knowledge source text** used
+   - Includes a button (e.g., "View Source" or "Show Exact Quote")
+   - Expanding the card reveals the **verbatim knowledge source text** used
 
 ### Benefits
 
-* Improves transparency and trust
-* Keeps the UI clean while allowing access to source content
-* Enables users to validate responses independently
+- Improves transparency and trust
+- Keeps the UI clean while allowing access to source content
+- Enables users to validate responses independently
 
 ---
 
@@ -174,9 +169,8 @@ This demo is designed to highlight the **possibility of returning and displaying
 4. The **Verbatim** topic retrieves raw knowledge source content and returns **only verbatim quotes** relevant to the question.
 
 5. The agent displays:
-
-   * The generated response
-   * An adaptive card with a **"Show details"** option
+   - The generated response
+   - An adaptive card with a **"Show details"** option
 
 6. When **"Show details"** is selected, the adaptive card reveals the **exact knowledge source quote** used to support the response.
 
@@ -186,10 +180,10 @@ This demo is designed to highlight the **possibility of returning and displaying
 
 ## ✅ Why This Pattern Matters
 
-* Preserves legal and HR wording
-* Supports compliance and audit scenarios
-* Increases user trust in AI responses
-* Suitable for enterprise Copilot deployments
+- Preserves legal and HR wording
+- Supports compliance and audit scenarios
+- Increases user trust in AI responses
+- Suitable for enterprise Copilot deployments
 
 ---
 
@@ -199,24 +193,24 @@ This demo intentionally focuses on the **pattern**, not a fixed implementation.
 
 Depending on the scenario, makers can modify:
 
-* Topic triggers (e.g., OnGenerated, custom entry points, or manual calls)
-* Topic structure and orchestration
-* How and when verbatim quotes are shown
-* The user experience (cards, messages, conditional display)
+- Topic triggers (e.g., OnGenerated, custom entry points, or manual calls)
+- Topic structure and orchestration
+- How and when verbatim quotes are shown
+- The user experience (cards, messages, conditional display)
 
 The key takeaway is the **capability**: Copilot Studio can retrieve, preserve, and present **verbatim knowledge source content** when required.
 
 You can:
 
-* Swap the knowledge source
-* Reuse the AI prompt template
-* Reuse the adaptive card pattern
+- Swap the knowledge source
+- Reuse the AI prompt template
+- Reuse the adaptive card pattern
 
 ---
 
 ## Repository Contents
 
-* Exported Copilot Studio solution
+- Exported Copilot Studio solution
 
 ---
 
