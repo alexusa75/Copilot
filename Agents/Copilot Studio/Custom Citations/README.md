@@ -7,9 +7,52 @@ This repo contains **two Topics** that override Copilot’s default citation foo
 
 - 🗂️ **Topic_Custom Citations Adaptive Card.yaml** — renders a two-column card (️⃣ number + 🔗 hyperlink), with an optional background style.
 - 📝 **Topic_Custom Citations_Formatted.yaml** — replaces the default footer with a **bold/italic** heading and a **numbered Markdown list**.
+- 🗃️ **Topic_Custom Citations_SPODownload_Restricted.yaml** — Replaces the default footer with a **bold/italic heading** and a **numbered Markdown list**. This update also adds logic to handle scenarios where customers restrict file downloads. *Review the SharePoint Online - Download-Restricted Citations section.*
 
 ---
 
+## 🔒 SharePoint Online – Download-Restricted Citations
+
+Some enterprise environments restrict **direct downloads from SharePoint Online**. Users may have view-only permissions, or security policies may block opening documents through direct file URLs.
+
+To support this scenario, this repo includes an additional Topic:
+
+- 🔒 **Topic_Custom Citations_SPODownload_Restricted.yaml**
+
+This Topic ensures citations pointing to SharePoint Online documents open **inside the document library** rather than triggering a direct file download.
+
+### How it works
+
+The Topic introduces a global Boolean flag:
+
+```
+Global.NoDownload
+```
+
+When this flag is set to `true`, the Topic:
+
+1. 🔎 Detects citation URLs that point to `sharepoint.com`
+2. 🔁 Rewrites direct file links such as:
+   ```
+   https://tenant.sharepoint.com/sites/Site/Docs/Folder/File.pdf
+   ```
+   into a SharePoint library view:
+   ```
+   https://tenant.sharepoint.com/sites/Site/Docs/Forms/AllItems.aspx
+   ?id=/sites/Site/Docs/Folder/File.pdf
+   &parent=/sites/Site/Docs/Folder
+   ```
+3. 🔐 Allows users to open documents within SharePoint, respecting permissions and avoiding forced downloads
+
+All other citation behavior remains unchanged:
+- External links are left untouched
+- Uploaded knowledge files continue to work
+- PDF page fragments (`#page=n`) are preserved
+- Titles remain human-friendly
+
+If `Global.NoDownload` is set to `false`, the Topic behaves exactly like the standard formatted citation variant.
+
+---
 ## 🌐 Why set `Topic.externalWebsiteURL`?
 
 When your bot cites **uploaded knowledge files** (files you add under *Knowledge sources* in Copilot Studio), the citation object often **won’t** include a direct `Url`. In those cases, the Topics:
