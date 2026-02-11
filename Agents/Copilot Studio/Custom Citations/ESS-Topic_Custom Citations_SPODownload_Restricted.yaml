@@ -1,0 +1,308 @@
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnGeneratedResponse
+  id: main
+  condition: =CountRows(System.Response.Citations)>0
+  actions:
+  - kind: SetVariable
+    id: setVariable_wtNwaw
+    variable: Topic.externalWebsiteURL
+    value: https://yourwebsite.com/citations/
+
+  - kind: SetVariable
+    id: setVariable_UIr27c
+    variable: Global.NoDownload
+    value: =true
+
+  - kind: SetVariable
+    id: setVariable_nwqe7g
+    variable: Topic.MyCitations
+    value: |-
+      =With(
+          { CT: System.Response.Citations },
+          Concat(
+              Sequence(CountRows(CT)),
+              With(
+                  {
+                      idx: Value,
+                      rec: Index(CT, Value)
+                  },
+                  With(
+                      {
+                          // ORIGINAL URL RESOLUTION (unchanged logic)
+                          originalUrl:
+                              If(
+                                  Not(IsBlank(rec.Url)),
+                                  rec.Url,
+                                  If(
+                                      Or(
+                                          Left(rec.Name, 8) = "https://",
+                                          Left(rec.Name, 7) = "http://"
+                                      ),
+                                      Substitute(rec.Name, " ", "%20"),
+                                      Substitute(Topic.externalWebsiteURL & rec.Name, " ", "%20")
+                                  )
+                              )
+                      },
+                      With(
+                          {
+                              // FINAL BASE URL (conditionally rewritten)
+                              baseUrl:
+                                  If(
+                                      And(
+                                          Global.NoDownload = true,
+                                          Find("sharepoint.com", originalUrl) > 0
+                                      ),
+                                      With(
+                                          {
+                                              pathStart: Find("/", originalUrl, 9)
+                                          },
+                                          With(
+                                              {
+                                                  serverRelativePath:
+                                                      Mid(
+                                                          originalUrl,
+                                                          pathStart,
+                                                          Len(originalUrl) - pathStart + 1
+                                                      ),
+
+                                                  fileName:
+                                                      Last(Split(originalUrl, "/")).Value,
+
+                                                  host:
+                                                      Left(originalUrl, pathStart - 1)
+                                              },
+                                              With(
+                                                  {
+                                                      parentPath:
+                                                          Left(
+                                                              serverRelativePath,
+                                                              Len(serverRelativePath) - Len(fileName) - 1
+                                                          )
+                                                  },
+                                                  With(
+                                                      {
+                                                          libraryPath:
+                                                              Left(
+                                                                  parentPath,
+                                                                  Len(parentPath) - Len(Last(Split(parentPath, "/")).Value) - 1
+                                                              )
+                                                      },
+                                                      host &
+                                                      libraryPath &
+                                                      "/Forms/AllItems.aspx" &
+                                                      "?id=" & serverRelativePath &
+                                                      "&parent=" & parentPath
+                                                  )
+                                              )
+                                          )
+                                      ),
+                                      originalUrl
+                                  ),
+
+                              // PAGE FRAGMENT (unchanged)
+                              pageFrag:
+                                  If(
+                                      And(
+                                          IsBlank(rec.Url),
+                                          EndsWith(rec.Name, ".pdf"),
+                                          Find("<page value=", rec.Text) > 0
+                                      ),
+                                      With(
+                                          {
+                                              q1: Find(Char(34), rec.Text, Find("<page value=", rec.Text)),
+                                              q2: Find(
+                                                  Char(34),
+                                                  rec.Text,
+                                                  Find(Char(34), rec.Text, Find("<page value=", rec.Text)) + 1
+                                              )
+                                          },
+                                          "#page=" & Mid(rec.Text, q1 + 1, q2 - q1 - 1)
+                                      ),
+                                      ""
+                                  ),
+
+                              // TITLE (unchanged)
+                              title:
+                                  Substitute(
+                                      If(
+                                          Find("?", Last(Split(rec.Name, "/")).Value) > 0,
+                                          Left(
+                                              Last(Split(rec.Name, "/")).Value,
+                                              Find("?", Last(Split(rec.Name, "/")).Value) - 1
+                                          ),
+                                          Last(Split(rec.Name, "/")).Value
+                                      ),
+                                      "%20",
+                                      " "
+                                  )
+                          },
+                          idx & ". [" & title & "](" & baseUrl & pageFrag & ")"
+                      )
+                  )
+              ),
+              Char(10)
+          )
+      )
+
+  - kind: SetVariable
+    id: setVariable_9IFwdP
+    variable: Topic.CitationsSnip
+    value: |-
+      =With(
+          { CT: System.Response.Citations },
+          Concat(
+              Sequence(CountRows(CT)),
+              With(
+                  {
+                      idx: Value,
+                      rec: Index(CT, Value)
+                  },
+                  With(
+                      {
+                          // ORIGINAL URL RESOLUTION (unchanged logic)
+                          originalUrl:
+                              If(
+                                  Not(IsBlank(rec.Url)),
+                                  rec.Url,
+                                  If(
+                                      Or(
+                                          Left(rec.Name, 8) = "https://",
+                                          Left(rec.Name, 7) = "http://"
+                                      ),
+                                      Substitute(rec.Name, " ", "%20"),
+                                      Substitute(Topic.externalWebsiteURL & rec.Name, " ", "%20")
+                                  )
+                              )
+                      },
+                      With(
+                          {
+                              // FINAL BASE URL (conditionally rewritten)
+                              baseUrl:
+                                  If(
+                                      And(
+                                          Global.NoDownload = true,
+                                          Find("sharepoint.com", originalUrl) > 0
+                                      ),
+                                      With(
+                                          {
+                                              pathStart: Find("/", originalUrl, 9)
+                                          },
+                                          With(
+                                              {
+                                                  serverRelativePath:
+                                                      Mid(
+                                                          originalUrl,
+                                                          pathStart,
+                                                          Len(originalUrl) - pathStart + 1
+                                                      ),
+
+                                                  fileName:
+                                                      Last(Split(originalUrl, "/")).Value,
+
+                                                  host:
+                                                      Left(originalUrl, pathStart - 1)
+                                              },
+                                              With(
+                                                  {
+                                                      parentPath:
+                                                          Left(
+                                                              serverRelativePath,
+                                                              Len(serverRelativePath) - Len(fileName) - 1
+                                                          )
+                                                  },
+                                                  With(
+                                                      {
+                                                          libraryPath:
+                                                              Left(
+                                                                  parentPath,
+                                                                  Len(parentPath) - Len(Last(Split(parentPath, "/")).Value) - 1
+                                                              )
+                                                      },
+                                                      host &
+                                                      libraryPath &
+                                                      "/Forms/AllItems.aspx" &
+                                                      "?id=" & serverRelativePath &
+                                                      "&parent=" & parentPath
+                                                  )
+                                              )
+                                          )
+                                      ),
+                                      originalUrl
+                                  ),
+
+                              // PAGE FRAGMENT (unchanged)
+                              pageFrag:
+                                  If(
+                                      And(
+                                          IsBlank(rec.Url),
+                                          EndsWith(rec.Name, ".pdf"),
+                                          Find("<page value=", rec.Text) > 0
+                                      ),
+                                      With(
+                                          {
+                                              q1: Find(Char(34), rec.Text, Find("<page value=", rec.Text)),
+                                              q2: Find(
+                                                  Char(34),
+                                                  rec.Text,
+                                                  Find(Char(34), rec.Text, Find("<page value=", rec.Text)) + 1
+                                              )
+                                          },
+                                          "#page=" & Mid(rec.Text, q1 + 1, q2 - q1 - 1)
+                                      ),
+                                      ""
+                                  ),
+
+                              // TITLE (unchanged)
+                              title:
+                                  Substitute(
+                                      If(
+                                          Find("?", Last(Split(rec.Name, "/")).Value) > 0,
+                                          Left(
+                                              Last(Split(rec.Name, "/")).Value,
+                                              Find("?", Last(Split(rec.Name, "/")).Value) - 1
+                                          ),
+                                          Last(Split(rec.Name, "/")).Value
+                                      ),
+                                      "%20",
+                                      " "
+                                  )
+                          },
+                          idx & ". [" & title & "](" & baseUrl & pageFrag & ")"
+                      )
+                  )
+              ),
+              Char(10)
+          )
+      )
+
+  - kind: SetVariable
+    id: setVariable_iiKiW8
+    variable: Topic._CustomRespond
+    value: |-
+      =With(
+        {
+          body: System.Response.FormattedText,
+          cut: Find("[1]:", System.Response.FormattedText)
+        },
+        If(
+          cut > 0,
+          Left(body, cut - 1),
+          body
+        )
+        & Char(10) & Char(10)                // blank line
+        & "**_Citations:_**" & Char(10)      // bold + italic heading on its own line
+        & Topic.CitationsSnip
+      )
+
+  - kind: SendActivity
+    id: sendActivity_TU8wlz
+    activity: "{Topic._CustomRespond}"
+
+  - kind: SetVariable
+    id: setVariable_jVzQGX
+    variable: System.ContinueResponse
+    value: false
+
+inputType: {}
+outputType: {}
