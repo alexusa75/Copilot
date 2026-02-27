@@ -1,0 +1,309 @@
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnGeneratedResponse
+  id: main
+  condition: =CountRows(System.Response.Citations)>0
+  actions:
+    - kind: SetVariable
+      id: setVariable_wtNwaw
+      variable: Topic.externalWebsiteURL
+      value: https://yourwebsite.com/citations/
+
+    - kind: SetVariable
+      id: setVariable_UIr27c
+      variable: Global.NoDownload
+      value: =true
+
+    - kind: SetVariable
+      id: setVariable_nwqe7g
+      variable: Topic.MyCitations
+      value: |-
+        =With(
+            { CT: System.Response.Citations },
+            Concat(
+                Sequence(CountRows(CT)),
+                With(
+                    {
+                        idx: Value,
+                        rec: Index(CT, Value)
+                    },
+                    With(
+                        {
+                            // ORIGINAL URL RESOLUTION
+                            originalUrl:
+                                If(
+                                    Not(IsBlank(rec.Url)),
+                                    rec.Url,
+                                    If(
+                                        Or(
+                                            Left(rec.Name, 8) = "https://",
+                                            Left(rec.Name, 7) = "http://"
+                                        ),
+                                        Substitute(rec.Name, " ", "%20"),
+                                        Substitute(Topic.externalWebsiteURL & rec.Name, " ", "%20")
+                                    )
+                                )
+                        },
+                        With(
+                            {
+                                // ✅ ADD ?web=1 ONLY FOR SHAREPOINT LINKS
+                                finalUrl:
+                                    If(
+                                        Find("sharepoint.com", originalUrl) > 0,
+                                        If(
+                                            Find("?", originalUrl) > 0,
+                                            originalUrl & "&web=1",
+                                            originalUrl & "?web=1"
+                                        ),
+                                        originalUrl
+                                    ),
+
+                                // PAGE FRAGMENT (unchanged)
+                                pageFrag:
+                                    If(
+                                        And(
+                                            IsBlank(rec.Url),
+                                            EndsWith(rec.Name, ".pdf"),
+                                            Find("<page value=", rec.Text) > 0
+                                        ),
+                                        With(
+                                            {
+                                                q1: Find(Char(34), rec.Text, Find("<page value=", rec.Text)),
+                                                q2: Find(
+                                                    Char(34),
+                                                    rec.Text,
+                                                    Find(Char(34), rec.Text, Find("<page value=", rec.Text)) + 1
+                                                )
+                                            },
+                                            "#page=" & Mid(rec.Text, q1 + 1, q2 - q1 - 1)
+                                        ),
+                                        ""
+                                    ),
+
+                                // TITLE (unchanged)
+                                title:
+                                    Substitute(
+                                        If(
+                                            Find("?", Last(Split(rec.Name, "/")).Value) > 0,
+                                            Left(
+                                                Last(Split(rec.Name, "/")).Value,
+                                                Find("?", Last(Split(rec.Name, "/")).Value) - 1
+                                            ),
+                                            Last(Split(rec.Name, "/")).Value
+                                        ),
+                                        "%20",
+                                        " "
+                                    )
+                            },
+                            idx & ". [" & title & "](" & finalUrl & pageFrag & ")"
+                        )
+                    )
+                ),
+                Char(10)
+            )
+        )
+
+    - kind: SetVariable
+      id: setVariable_9IFwdP
+      variable: Topic.CitationsSnip
+      value: |-
+        =With(
+            { CT: System.Response.Citations },
+            Concat(
+                Sequence(CountRows(CT)),
+                With(
+                    {
+                        idx: Value,
+                        rec: Index(CT, Value)
+                    },
+                    With(
+                        {
+                            // ORIGINAL URL RESOLUTION
+                            originalUrl:
+                                If(
+                                    Not(IsBlank(rec.Url)),
+                                    rec.Url,
+                                    If(
+                                        Or(
+                                            Left(rec.Name, 8) = "https://",
+                                            Left(rec.Name, 7) = "http://"
+                                        ),
+                                        Substitute(rec.Name, " ", "%20"),
+                                        Substitute(Topic.externalWebsiteURL & rec.Name, " ", "%20")
+                                    )
+                                )
+                        },
+                        With(
+                            {
+                                // ✅ ADD ?web=1 ONLY FOR SHAREPOINT LINKS
+                                finalUrl:
+                                    If(
+                                        Find("sharepoint.com", originalUrl) > 0,
+                                        If(
+                                            Find("?", originalUrl) > 0,
+                                            originalUrl & "&web=1",
+                                            originalUrl & "?web=1"
+                                        ),
+                                        originalUrl
+                                    ),
+
+                                // PAGE FRAGMENT (unchanged)
+                                pageFrag:
+                                    If(
+                                        And(
+                                            IsBlank(rec.Url),
+                                            EndsWith(rec.Name, ".pdf"),
+                                            Find("<page value=", rec.Text) > 0
+                                        ),
+                                        With(
+                                            {
+                                                q1: Find(Char(34), rec.Text, Find("<page value=", rec.Text)),
+                                                q2: Find(
+                                                    Char(34),
+                                                    rec.Text,
+                                                    Find(Char(34), rec.Text, Find("<page value=", rec.Text)) + 1
+                                                )
+                                            },
+                                            "#page=" & Mid(rec.Text, q1 + 1, q2 - q1 - 1)
+                                        ),
+                                        ""
+                                    ),
+
+                                // TITLE (unchanged)
+                                title:
+                                    Substitute(
+                                        If(
+                                            Find("?", Last(Split(rec.Name, "/")).Value) > 0,
+                                            Left(
+                                                Last(Split(rec.Name, "/")).Value,
+                                                Find("?", Last(Split(rec.Name, "/")).Value) - 1
+                                            ),
+                                            Last(Split(rec.Name, "/")).Value
+                                        ),
+                                        "%20",
+                                        " "
+                                    )
+                            },
+                            idx & ". [" & title & "](" & finalUrl & pageFrag & ")"
+                        )
+                    )
+                ),
+                Char(10)
+            )
+        )
+
+    - kind: SetVariable
+      id: setVariable_8TaUGy
+      variable: Topic._InitialResponseNoCitations
+      value: |-
+        =With(
+          {
+            body: System.Response.FormattedText,
+            cut: Find("[1]:", System.Response.FormattedText)
+          },
+          If(
+            cut > 0,
+            Left(body, cut - 1),
+            body
+          )
+        )
+
+    - kind: SetVariable
+      id: setVariable_bCaycr
+      variable: Topic._ResponseUrlWithSuffix
+      value: |-
+        =If(
+            !Global.NoDownload,
+            Topic._InitialResponseNoCitations,
+
+            With(
+                {
+                    textValue: Topic._InitialResponseNoCitations,
+                    matches:
+                        SortByColumns(
+                            MatchAll(
+                                Topic._InitialResponseNoCitations,
+                                "https:\/\/[a-zA-Z0-9\-]+\.sharepoint\.com\/[^\s\)]+"
+                            ),
+                            "StartMatch"
+                        )
+                },
+
+                If(
+                    CountRows(matches) = 0,
+                    textValue,
+
+                    Concat(
+                        Sequence(CountRows(matches)),
+
+                        Mid(
+                            textValue,
+                            If(
+                                Value = 1,
+                                1,
+                                Index(matches, Value - 1).StartMatch +
+                                Len(Index(matches, Value - 1).FullMatch)
+                            ),
+                            Index(matches, Value).StartMatch -
+                            If(
+                                Value = 1,
+                                1,
+                                Index(matches, Value - 1).StartMatch +
+                                Len(Index(matches, Value - 1).FullMatch)
+                            )
+                        )
+                        &
+                        If(
+                            Find("web=1", Index(matches, Value).FullMatch) > 0,
+                            Index(matches, Value).FullMatch,
+                            If(
+                                Find("?", Index(matches, Value).FullMatch) > 0,
+                                Index(matches, Value).FullMatch & "&web=1",
+                                Index(matches, Value).FullMatch & "?web=1"
+                            )
+                        )
+                    )
+                    &
+                    Mid(
+                        textValue,
+                        Index(matches, CountRows(matches)).StartMatch +
+                        Len(Index(matches, CountRows(matches)).FullMatch),
+                        Len(textValue)
+                    )
+                )
+            )
+        )
+
+    - kind: SetVariable
+      id: setVariable_5JTxSs
+      variable: Topic.RespondFormatted
+      value: ="<div><m-official> " & Topic._ResponseUrlWithSuffix & " </m-official></div>"
+
+    - kind: SetVariable
+      id: setVariable_iiKiW8
+      variable: Topic._CustomRespond
+      value: |-
+        =With(
+            { nl: Char(13) & Char(10) },
+            Topic.RespondFormatted
+            & nl & " " & nl
+            & "**_Citations:_**" & nl
+            & Topic.CitationsSnip
+            & nl & " " & nl
+            & "➡️ Check sources for accuracy"
+        )
+
+    - kind: SetVariable
+      id: setVariable_8PFbiS
+      variable: System.ContinueResponse
+      value: =false
+
+    - kind: SendActivity
+      id: sendActivity_TU8wlz
+      activity: "{Topic._CustomRespond}"
+
+    - kind: EndDialog
+      id: SeQwMx
+
+inputType: {}
+outputType: {}
